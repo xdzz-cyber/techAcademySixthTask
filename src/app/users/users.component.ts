@@ -1,28 +1,39 @@
-import { Component } from '@angular/core';
+import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import { UsersInterface } from './users.interface';
-import { UsersService } from '../users.service';
 import { MatCheckboxChange } from '@angular/material/checkbox';
+import {UsersService} from "../users.service";
 
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
-export class UsersComponent {
+export class UsersComponent implements OnChanges, OnInit{
+  @Input() user: UsersInterface | null = null;
   users: UsersInterface[] = [];
   selectedUsers: UsersInterface[] = [];
   filteredUsers: UsersInterface[] = [];
   sortByValue = 'firstname';
 
-  constructor(private userService: UsersService) {
-    this.fetchUsers();
+
+  constructor(private _userService: UsersService) {
   }
 
   private fetchUsers(): void {
-    this.userService.getUsers().subscribe(data => {
+    this._userService.getUsers().subscribe(data => {
       this.users = data;
       this.filteredUsers = data;
     });
+  }
+
+  ngOnInit() {
+     this.fetchUsers();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if(changes['user'].currentValue && !this.users.find(user => user.id == changes['user'].currentValue.id)){
+      this.filteredUsers.push(changes['user'].currentValue);
+    }
   }
 
   toggleSelect(user: UsersInterface): void {
@@ -35,16 +46,24 @@ export class UsersComponent {
   }
 
   onDeleteSelected(): void {
-    this.users = this.users.filter(user => !this.selectedUsers.includes(user));
-    this.filteredUsers = this.filteredUsers.filter(user => !this.selectedUsers.includes(user));
-    this.selectedUsers = [];
+    if(this.users && this.selectedUsers){
+      this.selectedUsers.forEach(selectedUser => {
+        this._userService.deleteUser(selectedUser.id).subscribe(data => {
+          if(data) throw new Error("User not deleted. Bad id"); // Because the server returns an empty object
+        });
+      });
+      this.users = this.users.filter(user => !this.selectedUsers.includes(user));
+      this.filteredUsers = this.filteredUsers.filter(user => !this.selectedUsers.includes(user));
+      this.selectedUsers = [];
+    }
+
   }
 
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    if (!filterValue) {
+    if (!filterValue && this.filteredUsers && this.users) {
       this.filteredUsers = this.users;
-    } else {
+    } else if(this.users){
       this.filteredUsers = this.users.filter(user =>
         user.firstName.toLowerCase().includes(filterValue.toLowerCase())
         || user.lastName.toLowerCase().includes(filterValue.toLowerCase())
@@ -69,4 +88,5 @@ export class UsersComponent {
       this.selectedUsers = [];
     }
   }
+
 }

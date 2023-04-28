@@ -301,8 +301,11 @@
     }
   }
 </style>
-<div class="content" role="main">
-  <app-users></app-users>
+<div class="content" role="main" style="display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr 1fr;">
+  <app-form (userCreated)="userCreatedHandler($event)"></app-form>
+  <app-users [user]="createdUser"></app-users>
 </div>
 
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->

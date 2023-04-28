@@ -2,8 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
-import {FormsModule} from "@angular/forms";
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatInputModule} from "@angular/material/input";
@@ -16,11 +15,14 @@ import {MatCardModule} from "@angular/material/card";
 import {UsersComponent} from "./users/users.component";
 import {MatSelectModule} from "@angular/material/select";
 import {MatListModule} from "@angular/material/list";
+import {HttpClientModule} from "@angular/common/http";
+import { FormComponent } from './forms/form/form.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    UsersComponent
+    UsersComponent,
+    FormComponent
   ],
   imports: [
     BrowserModule,
@@ -35,7 +37,9 @@ import {MatListModule} from "@angular/material/list";
     MatButtonModule,
     MatCardModule,
     MatSelectModule,
-    MatListModule
+    MatListModule,
+    HttpClientModule,
+    ReactiveFormsModule
   ],
   providers: [UsersService],
   bootstrap: [AppComponent]
